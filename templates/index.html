@@ -180,11 +180,12 @@
                 const targetLang = document.getElementById('targetLang').value;
 
                 try {
-                    const response = await fetch('https://api-free.deepl.com/v2/translate', {
+                    const response = await fetch('https://cors-anywhere.herokuapp.com/https://api-free.deepl.com/v2/translate', {
                         method: 'POST',
                         headers: {
                             'Authorization': 'DeepL-Auth-Key 72b32559-af90-415c-b067-263afe926c82:fx',
                             'Content-Type': 'application/json',
+                            'Origin': 'https://lamidetlm.github.io'
                         },
                         body: JSON.stringify({
                             text: [content],
@@ -192,16 +193,16 @@
                         })
                     });
 
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        result.textContent = data.translations[0].text;
-                        resultContainer.style.display = 'block';
-                    } else {
-                        alert('Erreur: ' + JSON.stringify(data));
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
+                    
+                    const data = await response.json();
+                    result.textContent = data.translations[0].text;
+                    resultContainer.style.display = 'block';
                 } catch (error) {
-                    alert('Erreur lors de la traduction: ' + error.message);
+                    console.error('Erreur détaillée:', error);
+                    alert('Erreur lors de la traduction. Vérifiez la console pour plus de détails.');
                 }
             };
             reader.readAsText(currentFile);
